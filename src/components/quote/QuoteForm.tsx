@@ -22,8 +22,7 @@ import AlternateEmailRoundedIcon from "@mui/icons-material/AlternateEmailRounded
 
 // Endpoints y contacto
 const FORM_ENDPOINT = "https://formspree.io/f/xvgbonek";
-const PHONE_TEL = "+50581994598";
-const PHONE_DISPLAY = "(+505) 8199-4598";
+const PHONE_TEL = "+14156851462"; // (415) 685-1462
 
 // Opciones
 const FACILITY_OPTIONS: { group: string; items: string[] }[] = [
@@ -107,32 +106,7 @@ export default function QuoteForm() {
     setErrors((prev) => ({ ...prev, [field]: msg || undefined }));
   };
 
-  // Asunto del correo
-  const emailSubject = useMemo(() => {
-    const parts = ["New Quote"];
-    if (city) parts.push(city);
-    if (facility) parts.push(facility);
-    if (frequency) parts.push(frequency);
-    return parts.join(" • ");
-  }, [city, facility, frequency]);
-
-  // Resumen bonito
-  const emailSummary = useMemo(() => {
-    const lines = [
-      "Lead summary",
-      `Name: ${name || "-"}`,
-      `City: ${city || "-"}`,
-      `Email: ${email || "-"}`,
-      `Phone: ${phone || "-"}`,
-      `Facility: ${facility || "-"}`,
-      `Frequency: ${frequency || "-"}`,
-      `Preferred contact: ${contactMethod || "-"}`,
-      bestTime ? `Best time: ${bestTime}` : "",
-    ].filter(Boolean);
-    return lines.join("\n");
-  }, [name, city, email, phone, facility, frequency, contactMethod, bestTime]);
-
-  // WhatsApp prellenado
+  // WhatsApp prellenado (para CTA post-envío)
   const waText = useMemo(() => {
     const lines = [
       `Hi Marina Cleans! I'm ${name || "a new lead"} from ${city || "the SF Bay Area"}.`,
@@ -160,6 +134,7 @@ export default function QuoteForm() {
       return;
     }
 
+    // Solo enviamos los campos que el usuario completó
     const data = new FormData();
     for (const [k, val] of raw.entries()) {
       if (typeof val === "string") {
@@ -216,10 +191,7 @@ export default function QuoteForm() {
       <Box sx={(t) => ({ height: 6, background: `linear-gradient(90deg, ${t.palette.primary.main}, ${t.palette.secondary.main})` })} />
 
       <CardContent component="form" onSubmit={onSubmit} noValidate sx={{ p: { xs: 2.5, md: 3 } }}>
-        {/* Campos ocultos para Formspree */}
-        <input type="hidden" name="_subject" value={emailSubject} />
-        <input type="hidden" name="_replyto" value={email} />
-        <input type="hidden" name="00_summary" value={emailSummary} />
+        {/* ❌ Se eliminaron los inputs ocultos _subject, _replyto y summary */}
 
         <Grid container rowSpacing={2.5} columnSpacing={2.5}>
           {/* Row 1 */}

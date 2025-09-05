@@ -102,7 +102,7 @@ function FeatureRow({ icon: Icon, title, desc, accent = "primary" }: Feature) {
     <Paper
       variant="outlined"
       sx={(t) => {
-        const { fg, glow } = getAccentColors(t, accent);
+        const { fg } = getAccentColors(t, accent);
         return {
           p: { xs: 2.25, md: 2.75 },
           borderRadius: 3,

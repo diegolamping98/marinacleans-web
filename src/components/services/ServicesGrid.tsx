@@ -1,4 +1,5 @@
 // src/components/services/ServicesGrid.tsx
+import type { Variants } from "framer-motion";
 import Grid from "@mui/material/Grid";
 import { Box } from "@mui/material";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
@@ -7,6 +8,8 @@ import WindowIcon from "@mui/icons-material/Window";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import ServiceCard from "./ServiceCard";
 import { motion, useReducedMotion } from "framer-motion";
+
+const MotionGrid = motion(Grid);
 
 const SERVICES = [
   {
@@ -54,41 +57,43 @@ const SERVICES = [
 export default function ServicesGrid() {
   const reduce = useReducedMotion();
 
-  const container = {
+  const container: Variants = {
     hidden: {},
     show: {
       transition: { staggerChildren: reduce ? 0 : 0.08 },
     },
   };
 
-  const item = {
+  const item: Variants = {
     hidden: { opacity: 0, y: 14 },
     show: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.45, ease: "easeOut" },
+      transition: {
+        duration: 0.45,
+        // cubic-bezier equivalente a un easeOut suave
+        ease: [0.22, 1, 0.36, 1],
+      },
     },
   };
 
   return (
     <Box>
-      <Grid
+      <MotionGrid
         container
         spacing={{ xs: 2.5, md: 3 }}
-        component={motion.div}
         variants={container}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
       >
         {SERVICES.map((s) => (
-          <Grid
+          <MotionGrid
             key={s.title}
             item
             xs={12}
             sm={6}
             md={3}
-            component={motion.div}
             variants={item}
           >
             <ServiceCard
@@ -99,9 +104,9 @@ export default function ServicesGrid() {
               imgSrc={s.imgSrc}
               imgAlt={s.imgAlt}
             />
-          </Grid>
+          </MotionGrid>
         ))}
-      </Grid>
+      </MotionGrid>
     </Box>
   );
 }

@@ -1,7 +1,7 @@
 // src/components/work/BeforeAfterSection.tsx
 import * as React from "react";
 import {
-  Box, Container, Stack, Typography, Button, IconButton, useMediaQuery
+  Box, Container, Stack, Typography, IconButton, useMediaQuery
 } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";

@@ -23,7 +23,7 @@ export default function TestimonialsGrid() {
     <Box>
       {/* Solo el chip (título lo pone el Home) */}
       <Box
-        sx={(t) => ({
+        sx={() => ({
           display: "flex",
           justifyContent: { xs: "center", md: "flex-end" },
           mb: 3,

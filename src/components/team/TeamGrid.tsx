@@ -14,14 +14,14 @@ import VerifiedRoundedIcon from "@mui/icons-material/VerifiedRounded";
 import WorkOutlineRoundedIcon from "@mui/icons-material/WorkOutlineRounded";
 import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
 import { alpha } from "@mui/material/styles";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 type Member = {
   name: string;
   role: string;
   years: number;
-  bio: string;       // resumen corto
-  longBio?: string;  // versión extendida (opcional)
+  bio: string;
+  longBio?: string;
   photoUrl?: string;
 };
 
@@ -52,7 +52,9 @@ const MEMBERS: Member[] = [
   },
 ];
 
-// Iniciales robustas (espacios múltiples / guiones)
+// Motion wrappers correctos (evita component={motion.div})
+const MotionGrid = motion(Grid);
+
 function initials(name: string) {
   return name
     .trim()
@@ -79,7 +81,8 @@ function TeamCard({ name, role, years, bio, longBio, photoUrl }: Member) {
         transition:
           "transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease",
         background: `linear-gradient(180deg, ${alpha(t.palette.primary.main, 0.04)}, ${alpha(
-          t.palette.secondary.main, 0.04
+          t.palette.secondary.main,
+          0.04
         )})`,
         borderColor: alpha(t.palette.primary.main, 0.12),
         "&:hover": {
@@ -87,7 +90,8 @@ function TeamCard({ name, role, years, bio, longBio, photoUrl }: Member) {
           boxShadow: `0 14px 32px ${alpha(t.palette.primary.main, 0.18)}`,
           borderColor: alpha(t.palette.primary.main, 0.35),
           background: `linear-gradient(180deg, ${alpha(t.palette.primary.main, 0.06)}, ${alpha(
-            t.palette.secondary.main, 0.06
+            t.palette.secondary.main,
+            0.06
           )})`,
         },
         "&:focus-visible": {
@@ -113,20 +117,19 @@ function TeamCard({ name, role, years, bio, longBio, photoUrl }: Member) {
 
       <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
         <Stack spacing={1.75} alignItems="center" textAlign="center">
-          {/* Avatar con halo (ligero float animation en no-reduce) */}
+          {/* Avatar con halo y leve float */}
           <Box
             component={motion.div}
-            animate={
-              reduce ? undefined : { y: [0, -2, 0] }
-            }
-            transition={reduce ? undefined : { duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            animate={reduce ? undefined : { y: [0, -2, 0] }}
+            transition={reduce ? undefined : { duration: 3, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
             sx={(t) => ({
               position: "relative",
               p: 0.8,
               borderRadius: "50%",
-              background: `linear-gradient(135deg, ${alpha(t.palette.secondary.main, 0.22)}, ${alpha(
-                t.palette.secondary.light, 0.28
-              )})`,
+              background: `linear-gradient(135deg, ${alpha(
+                t.palette.secondary.main,
+                0.22
+              )}, ${alpha(t.palette.secondary.light, 0.28)})`,
               border: `1px solid ${alpha(t.palette.secondary.main, 0.45)}`,
               boxShadow: `0 0 0 6px ${alpha(t.palette.primary.main, 0.05)}`,
             })}
@@ -177,7 +180,7 @@ function TeamCard({ name, role, years, bio, longBio, photoUrl }: Member) {
             {name}
           </Typography>
 
-          {/* Chips consistentes con la paleta */}
+          {/* Chips */}
           <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center">
             <Chip
               size="small"
@@ -203,7 +206,7 @@ function TeamCard({ name, role, years, bio, longBio, photoUrl }: Member) {
             />
           </Stack>
 
-          {/* Bio (corta/larga) */}
+          {/* Bio */}
           <Typography
             id={textId}
             variant="body2"
@@ -247,40 +250,35 @@ function TeamCard({ name, role, years, bio, longBio, photoUrl }: Member) {
 export default function TeamGrid() {
   const reduce = useReducedMotion();
 
-  const container = {
+  const container: Variants = {
     hidden: {},
     show: { transition: { staggerChildren: reduce ? 0 : 0.08 } },
   };
 
-  const item = {
+  const item: Variants = {
     hidden: { opacity: 0, y: 14 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] }, // easeOut válido
+    },
   };
 
   return (
-    <Grid
+    <MotionGrid
       container
       spacing={4}
       alignItems="stretch"
-      component={motion.div}
       variants={container}
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, amount: 0.2 }}
     >
       {MEMBERS.map((m) => (
-        <Grid
-          key={m.name}
-          item
-          xs={12}
-          sm={6}
-          md={4}
-          component={motion.div}
-          variants={item}
-        >
+        <MotionGrid key={m.name} item xs={12} sm={6} md={4} variants={item}>
           <TeamCard {...m} />
-        </Grid>
+        </MotionGrid>
       ))}
-    </Grid>
+    </MotionGrid>
   );
 }

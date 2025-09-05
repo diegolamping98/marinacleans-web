@@ -1,15 +1,15 @@
 import * as React from "react";
 import { Box, Card, Chip, Stack, Typography } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 type Props = {
-  beforeSrc?: string;     // ← pondrás /public/lo-que-sea.jpg cuando las tengas
+  beforeSrc?: string;
   afterSrc?: string;
   alt?: string;
   caption?: string;
   tags?: string[];
-  ratio?: `${number} / ${number}`; // ej: "4 / 3" | "16 / 9"
+  ratio?: `${number} / ${number}`;
 };
 
 const MotionCard = motion(Card);
@@ -25,9 +25,10 @@ export default function BeforeAfterCard({
   const theme = useTheme();
   const reduce = useReducedMotion();
 
-  // % visible del "antes"
+  // ✅ ref tipado correctamente (sin "| null" en el genérico)
+  const wrapRef = React.useRef<HTMLDivElement>(null);
+
   const [percent, setPercent] = React.useState(50);
-  const wrapRef = React.useRef<HTMLDivElement | null>(null);
   const draggingRef = React.useRef(false);
 
   const setByClientX = (clientX: number) => {
@@ -38,17 +39,31 @@ export default function BeforeAfterCard({
     setPercent(Math.min(100, Math.max(0, p)));
   };
 
-  const onDown: React.MouseEventHandler | React.TouchEventHandler = (e: any) => {
+  // 🔧 Handlers separados para mouse/touch (evita uniones raras)
+  const handleMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
     draggingRef.current = true;
-    setByClientX("touches" in e ? e.touches[0].clientX : e.clientX);
+    setByClientX(e.clientX);
   };
-  const onMove: React.MouseEventHandler | React.TouchEventHandler = (e: any) => {
+  const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
     if (!draggingRef.current) return;
-    setByClientX("touches" in e ? e.touches[0].clientX : e.clientX);
+    setByClientX(e.clientX);
   };
-  const onUp = () => (draggingRef.current = false);
+  const handleMouseUp: React.MouseEventHandler<HTMLDivElement> = () => {
+    draggingRef.current = false;
+  };
 
-  // accesible con teclado
+  const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
+    draggingRef.current = true;
+    setByClientX(e.touches[0].clientX);
+  };
+  const handleTouchMove: React.TouchEventHandler<HTMLDivElement> = (e) => {
+    if (!draggingRef.current) return;
+    setByClientX(e.touches[0].clientX);
+  };
+  const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = () => {
+    draggingRef.current = false;
+  };
+
   const onKey: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
     if (e.key === "ArrowLeft") setPercent((p) => Math.max(0, p - 5));
     if (e.key === "ArrowRight") setPercent((p) => Math.min(100, p + 5));
@@ -56,13 +71,22 @@ export default function BeforeAfterCard({
 
   const borderCol = alpha(theme.palette.primary.main, 0.12);
 
+  const cardIn: Variants = {
+    hidden: { opacity: 0, y: 18 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] }, // ✅ easing válido
+    },
+  };
+
   return (
     <MotionCard
       variant="outlined"
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial="hidden"
+      whileInView="show"
       viewport={{ once: true, amount: 0.35 }}
-      transition={{ duration: 0.55, ease: "easeOut" }}
+      variants={cardIn}
       whileHover={reduce ? undefined : { y: -4, boxShadow: theme.shadows[8] }}
       sx={{
         height: "100%",
@@ -74,13 +98,13 @@ export default function BeforeAfterCard({
       {/* Comparador */}
       <Box
         ref={wrapRef}
-        onMouseDown={onDown}
-        onMouseMove={onMove}
-        onMouseUp={onUp}
-        onMouseLeave={onUp}
-        onTouchStart={onDown}
-        onTouchMove={onMove}
-        onTouchEnd={onUp}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onKeyDown={onKey}
         tabIndex={0}
         role="group"
@@ -158,20 +182,21 @@ export default function BeforeAfterCard({
           />
         </Box>
 
-        {/* Range oculto para ATs (extra accesibilidad) */}
+        {/* Range oculto para ATs */}
         <Box
           component="input"
           type="range"
           min={0}
           max={100}
           value={percent}
-          onChange={(e: any) => setPercent(parseInt(e.target.value, 10))}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPercent(parseInt(e.target.value, 10))
+          }
           aria-label="Slide to compare before and after"
           sx={{ position: "absolute", inset: 0, opacity: 0, pointerEvents: "none" }}
         />
       </Box>
 
-      {/* Texto / etiquetas */}
       {(caption || tags.length) && (
         <Stack spacing={1.25} sx={{ p: { xs: 2, md: 2.5 } }}>
           {caption && (
@@ -217,7 +242,6 @@ function ImageOrPlaceholder({
   const theme = useTheme();
 
   if (!src) {
-    // Placeholder bonito con gradiente y etiqueta
     const bg =
       side === "before"
         ? `linear-gradient(135deg, ${alpha(theme.palette.error.main, 0.16)}, ${alpha(
