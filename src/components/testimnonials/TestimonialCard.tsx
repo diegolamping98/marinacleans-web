@@ -37,7 +37,8 @@ export default function TestimonialCard({
           t.palette.secondary.main,
           0.03
         )})`,
-        transition: "transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease",
+        transition:
+          "transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease",
         borderColor: alpha(t.palette.primary.main, 0.12),
         "&:hover": {
           transform: "translateY(-4px)",
@@ -97,15 +98,15 @@ export default function TestimonialCard({
                   display: "grid",
                   placeItems: "center",
                   color: t.palette.primary.main,
-                  background: `linear-gradient(135deg, ${alpha(t.palette.secondary.main, 0.22)}, ${alpha(
-                    t.palette.secondary.light,
-                    0.28
-                  )})`,
+                  background: `linear-gradient(135deg, ${alpha(
+                    t.palette.secondary.main,
+                    0.22
+                  )}, ${alpha(t.palette.secondary.light, 0.28)})`,
                   border: `1px solid ${alpha(t.palette.secondary.main, 0.45)}`,
-                  boxShadow: `0 10px 24px ${alpha(t.palette.secondary.main, 0.26)}, inset 0 1px 0 ${alpha(
-                    "#fff",
-                    0.35
-                  )}`,
+                  boxShadow: `0 10px 24px ${alpha(
+                    t.palette.secondary.main,
+                    0.26
+                  )}, inset 0 1px 0 ${alpha("#fff", 0.35)}`,
                 })}
               >
                 <FormatQuoteRoundedIcon fontSize="small" />
@@ -122,7 +123,7 @@ export default function TestimonialCard({
                 placeItems: "center",
                 fontWeight: 800,
                 color: t.palette.primary.dark,
-                backgroundColor: alpha(t.palette.primary.main, 0.10),
+                backgroundColor: alpha(t.palette.primary.main, 0.1),
                 border: `1px solid ${alpha(t.palette.primary.main, 0.25)}`,
               })}
               aria-hidden
@@ -141,7 +142,11 @@ export default function TestimonialCard({
               i < rating ? (
                 <StarRoundedIcon key={i} fontSize="small" />
               ) : (
-                <StarOutlineRoundedIcon key={i} fontSize="small" sx={{ color: "action.disabled" }} />
+                <StarOutlineRoundedIcon
+                  key={i}
+                  fontSize="small"
+                  sx={{ color: "action.disabled" }}
+                />
               )
             )}
           </Box>

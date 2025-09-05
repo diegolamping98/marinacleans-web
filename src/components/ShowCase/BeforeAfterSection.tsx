@@ -20,17 +20,30 @@ type Item = {
 };
 
 /** Sustituye los src cuando tengas las fotos públicas (p.ej. "/work/kitchen-before.jpg") */
+/** Usa rutas absolutas a /public */
 const ITEMS: Item[] = [
-  { caption: "Kitchen deep clean",         tags: ["Grease removal", "Detailing"] },
-  { caption: "Post-construction bathroom", tags: ["Dust-free", "Glass & grout"] },
-  { caption: "Move-out cleaning",          tags: ["Baseboards", "Appliances"] },
-  { caption: "Closet organization",        tags: ["Declutter", "Labeling"] },
-  { caption: "Office refresh",             tags: ["Desks", "Common areas"] },
-  { caption: "Windows & tracks",           tags: ["Squeegee", "Frames & screens"] },
-  { caption: "Fridge & oven detail",       tags: ["Degrease", "Sanitize"] },
-  { caption: "Tile & grout brightening",   tags: ["Scrub", "Seal-ready"] },
-  { caption: "Garage clean-up",            tags: ["Dust", "Cobwebs"] },
-  { caption: "Laundry room reset",         tags: ["Surfaces", "Systems"] },
+  {
+    beforeSrc: "/bathroom-before.jpeg",
+    afterSrc: "/bathroom-after.jpeg",
+    alt: "Bathroom deep clean before and after",
+    caption: "Bathroom deep clean",
+    tags: ["Bathtub", "Mold removal", "Shine"],
+  },
+  {
+    beforeSrc: "/closet1.jpeg",
+    afterSrc: "/closet2.jpeg",
+    alt: "Closet organization before and after",
+    caption: "Closet organization",
+    tags: ["Declutter", "Folding", "Labeling"],
+  },
+  {
+    beforeSrc: "/lavava-nuevo.jpeg",
+    afterSrc: "/lavavo-antes.jpeg",
+    alt: "Sink area refresh before and after",
+    caption: "Sink refresh",
+    tags: [ "Polish", "Sanitize"],
+  },
+  
 ];
 
 export default function BeforeAfterSection() {
