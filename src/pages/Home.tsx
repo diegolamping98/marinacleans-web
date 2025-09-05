@@ -15,7 +15,7 @@ import WhyUsCard from "../components/quote/WhyUsCard";
 import TestimonialsGrid from "../components/testimnonials/TestimonialsGrid";
 import ServiceAreaMap from "../components/contact/ServiceAreaMap";
 import FeaturesGrid from "../components/why/FeaturesGrid";
-import BeforeAfterSection from "../components/showcase/BeforeAfterSection"; // 👈 NUEVO
+import BeforeAfterSection from "../components/ShowCase/BeforeAfterSection";
 
 export default function Home() {
   return (
