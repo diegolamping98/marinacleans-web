@@ -22,30 +22,42 @@ export default function WhyUsCard({ hideQuickChips = false }: Props) {
     <Card variant="outlined" sx={CARD_SX as any}>
       {/* franja superior brand */}
       <Box sx={(t) => ({ height: 6, background: `linear-gradient(90deg, ${t.palette.primary.main}, ${t.palette.secondary.main})` })} />
-      <CardContent sx={{ p: { xs: 2.25, md: 2.75 } }}>
-        <Typography variant="h6" fontWeight={900} sx={{ letterSpacing: "-0.01em", mb: 1 }}>
+
+      <CardContent sx={{ p: { xs: 2, md: 2.75 } }}>
+        <Typography
+          variant="h6"
+          fontWeight={900}
+          sx={{ letterSpacing: "-0.01em", mb: { xs: 1, md: 1 } }}
+        >
           Why choose us?
         </Typography>
 
-        <List dense disablePadding sx={{ mb: 1.5 }}>
+        <List dense disablePadding sx={{ mb: { xs: 1.25, md: 1.5 } }}>
           {[
             "Vetted and punctual teams",
             "Professional materials & techniques",
             "Satisfaction guaranteed",
           ].map((t) => (
-            <ListItem key={t} disableGutters sx={{ py: 0.25 }}>
-              <ListItemIcon sx={{ minWidth: 30 }}>
+            <ListItem key={t} disableGutters sx={{ py: { xs: 0.25, md: 0.25 } }}>
+              <ListItemIcon sx={{ minWidth: { xs: 28, md: 30 } }}>
                 <Box sx={(theme) => ({
-                  width: 22, height: 22, borderRadius: "50%",
+                  width: { xs: 20, md: 22 },
+                  height: { xs: 20, md: 22 },
+                  borderRadius: "50%",
                   bgcolor: alpha(theme.palette.primary.main, 0.12),
                   color: theme.palette.primary.main,
-                  display: "flex", alignItems: "center", justifyContent: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                   border: `1px solid ${alpha(theme.palette.primary.main, 0.28)}`
                 })}>
-                  <CheckCircleRoundedIcon sx={{ fontSize: 16 }} />
+                  <CheckCircleRoundedIcon sx={{ fontSize: { xs: 15, md: 16 } }} />
                 </Box>
               </ListItemIcon>
-              <ListItemText primaryTypographyProps={{ color: "text.secondary" }} primary={t} />
+              <ListItemText
+                primaryTypographyProps={{ color: "text.secondary", sx: { fontSize: { xs: 14, md: 16 } } }}
+                primary={t}
+              />
             </ListItem>
           ))}
         </List>
@@ -54,14 +66,16 @@ export default function WhyUsCard({ hideQuickChips = false }: Props) {
           Fast response — usually in minutes.
         </Typography>
 
-        <Divider sx={{ my: 1.75 }} />
+        <Divider sx={{ my: { xs: 1.5, md: 1.75 } }} />
 
-        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1 }}>
+        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: { xs: 1, md: 1 } }}>
           Quick contact
         </Typography>
 
         {/* Evita duplicar info si en la página también muestras ContactTiles */}
-        <QuickContact showChips={!hideQuickChips} showActions />
+        <Box sx={{ "& .quick-contact-actions": { gap: { xs: 1, md: 1.25 } } }}>
+          <QuickContact showChips={!hideQuickChips} showActions />
+        </Box>
       </CardContent>
     </Card>
   );

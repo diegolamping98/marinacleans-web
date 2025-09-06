@@ -1,4 +1,3 @@
-// src/components/work/BeforeAfterSection.tsx
 import * as React from "react";
 import {
   Box, Container, Stack, Typography, IconButton, useMediaQuery
@@ -19,8 +18,6 @@ type Item = {
   tags?: string[];
 };
 
-/** Sustituye los src cuando tengas las fotos públicas (p.ej. "/work/kitchen-before.jpg") */
-/** Usa rutas absolutas a /public */
 const ITEMS: Item[] = [
   {
     beforeSrc: "/bathroom-before.jpeg",
@@ -41,21 +38,20 @@ const ITEMS: Item[] = [
     afterSrc: "/lavavo-antes.jpeg",
     alt: "Sink area refresh before and after",
     caption: "Sink refresh",
-    tags: [ "Polish", "Sanitize"],
+    tags: ["Polish", "Sanitize"],
   },
-  
 ];
 
 export default function BeforeAfterSection() {
   const theme = useTheme();
   const isMd = useMediaQuery(theme.breakpoints.up("md"));
   const isLg = useMediaQuery(theme.breakpoints.up("lg"));
-  const perView = isLg ? 3 : isMd ? 2 : 1;  // 1/2/3 tarjetas visibles
+  const perView = isLg ? 3 : isMd ? 2 : 1;
 
   const scrollerRef = React.useRef<HTMLDivElement | null>(null);
   const [paused, setPaused] = React.useState(false);
 
-  // autoplay suave usando scroll-snap
+  // autoplay suave usando scroll-snap (pausado en táctil)
   React.useEffect(() => {
     if (paused) return;
     const el = scrollerRef.current;
@@ -66,7 +62,6 @@ export default function BeforeAfterSection() {
       const atEnd = el.scrollLeft + viewW >= el.scrollWidth - el.clientWidth - 2;
 
       if (atEnd) {
-        // wrap al inicio
         el.scrollTo({ left: 0, behavior: "smooth" });
       } else {
         el.scrollBy({ left: viewW, behavior: "smooth" });
@@ -93,7 +88,7 @@ export default function BeforeAfterSection() {
     }
   };
 
-  // cálculo de “página” para los dots
+  // “página” para los dots
   const [page, setPage] = React.useState(0);
   const pages = Math.max(1, Math.ceil(ITEMS.length / perView));
 
@@ -110,13 +105,13 @@ export default function BeforeAfterSection() {
       id="work"
       component="section"
       sx={(t) => ({
-        py: { xs: 8, md: 12 },
+        py: { xs: 6, md: 12 }, // ↓ móvil más compacto
         background: `linear-gradient(180deg, #FFFFFF 0%, ${alpha(t.palette.primary.light, 0.10)} 100%)`,
         borderTop: `1px solid ${alpha(t.palette.primary.main, 0.06)}`,
       })}
     >
       <Container maxWidth="xl">
-        {/* Encabezado animado */}
+        {/* Encabezado */}
         <Stack spacing={1} sx={{ mb: { xs: 3.5, md: 5 }, textAlign: "center" }}>
           <MotionBox
             initial={{ opacity: 0, y: 12 }}
@@ -144,21 +139,26 @@ export default function BeforeAfterSection() {
         <Box
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
+          onTouchStart={() => setPaused(true)}   // pausa en táctil
+          onTouchEnd={() => setPaused(false)}    // reanuda al soltar
           sx={{ position: "relative" }}
         >
-          {/* Controles flecha */}
+          {/* Controles flecha (más pequeños en móvil) */}
           <IconButton
             aria-label="Previous"
             onClick={handlePrev}
             sx={(t) => ({
               position: "absolute",
               zIndex: 2,
-              left: { xs: 4, md: 8 },
+              left: { xs: 2, md: 8 },
               top: "50%",
               transform: "translateY(-50%)",
               bgcolor: "background.paper",
               border: `1px solid ${t.palette.divider}`,
               boxShadow: 2,
+              width: { xs: 32, md: 40 },
+              height: { xs: 32, md: 40 },
+              "& .MuiSvgIcon-root": { fontSize: { xs: 20, md: 24 } },
               "&:hover": { bgcolor: alpha(t.palette.primary.main, 0.06) },
             })}
           >
@@ -171,12 +171,15 @@ export default function BeforeAfterSection() {
             sx={(t) => ({
               position: "absolute",
               zIndex: 2,
-              right: { xs: 4, md: 8 },
+              right: { xs: 2, md: 8 },
               top: "50%",
               transform: "translateY(-50%)",
               bgcolor: "background.paper",
               border: `1px solid ${t.palette.divider}`,
               boxShadow: 2,
+              width: { xs: 32, md: 40 },
+              height: { xs: 32, md: 40 },
+              "& .MuiSvgIcon-root": { fontSize: { xs: 20, md: 24 } },
               "&:hover": { bgcolor: alpha(t.palette.primary.main, 0.06) },
             })}
           >
@@ -199,25 +202,15 @@ export default function BeforeAfterSection() {
               display: "grid",
               gridAutoFlow: "column",
               gap: { xs: 2, md: 3 },
-              // columnas responsivas (1 / 2 / 3)
-              gridAutoColumns: {
-                xs: "100%",
-                md: "50%",
-                lg: "33.3333%",
-              },
+              gridAutoColumns: { xs: "100%", md: "50%", lg: "33.3333%" }, // 1/2/3 por vista
               px: { xs: 1, md: 2 },
               py: 1,
-              // ocultar scrollbar (estilos cross-browser)
               scrollbarWidth: "none",
               "&::-webkit-scrollbar": { display: "none" },
             }}
           >
             {ITEMS.map((it, i) => (
-              <motion.div
-                key={i}
-                style={{ scrollSnapAlign: "start" }}
-                whileHover={{ scale: 1.01 }}
-              >
+              <motion.div key={i} style={{ scrollSnapAlign: "start" }} whileHover={{ scale: 1.01 }}>
                 <BeforeAfterCard
                   beforeSrc={it.beforeSrc}
                   afterSrc={it.afterSrc}
@@ -240,26 +233,16 @@ export default function BeforeAfterSection() {
                   height: 8,
                   borderRadius: 999,
                   transition: "all .25s ease",
-                  bgcolor:
-                    i === page
-                      ? t.palette.primary.main
-                      : alpha(t.palette.primary.main, 0.25),
+                  bgcolor: i === page ? t.palette.primary.main : alpha(t.palette.primary.main, 0.25),
                 })}
               />
             ))}
           </Stack>
         </Box>
 
-        {/* CTA */}
+        {/* CTA (si la necesitas, puedes poner un botón aquí) */}
         <Stack spacing={2} alignItems="center" sx={{ mt: { xs: 5, md: 6 } }}>
-          <MotionBox
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: .5 }}
-          >
-           
-          </MotionBox>
+          {/* vacío intencionalmente */}
         </Stack>
       </Container>
     </Box>

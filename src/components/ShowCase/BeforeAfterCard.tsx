@@ -25,7 +25,6 @@ export default function BeforeAfterCard({
   const theme = useTheme();
   const reduce = useReducedMotion();
 
-  // ✅ ref tipado correctamente (sin "| null" en el genérico)
   const wrapRef = React.useRef<HTMLDivElement>(null);
 
   const [percent, setPercent] = React.useState(50);
@@ -39,7 +38,7 @@ export default function BeforeAfterCard({
     setPercent(Math.min(100, Math.max(0, p)));
   };
 
-  // 🔧 Handlers separados para mouse/touch (evita uniones raras)
+  // Mouse
   const handleMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
     draggingRef.current = true;
     setByClientX(e.clientX);
@@ -52,6 +51,7 @@ export default function BeforeAfterCard({
     draggingRef.current = false;
   };
 
+  // Touch (evita scroll-while-drag en móvil)
   const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
     draggingRef.current = true;
     setByClientX(e.touches[0].clientX);
@@ -59,6 +59,7 @@ export default function BeforeAfterCard({
   const handleTouchMove: React.TouchEventHandler<HTMLDivElement> = (e) => {
     if (!draggingRef.current) return;
     setByClientX(e.touches[0].clientX);
+    e.preventDefault();
   };
   const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = () => {
     draggingRef.current = false;
@@ -67,6 +68,8 @@ export default function BeforeAfterCard({
   const onKey: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
     if (e.key === "ArrowLeft") setPercent((p) => Math.max(0, p - 5));
     if (e.key === "ArrowRight") setPercent((p) => Math.min(100, p + 5));
+    if (e.key === "Home") setPercent(0);
+    if (e.key === "End") setPercent(100);
   };
 
   const borderCol = alpha(theme.palette.primary.main, 0.12);
@@ -76,7 +79,7 @@ export default function BeforeAfterCard({
     show: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] }, // ✅ easing válido
+      transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
     },
   };
 
@@ -93,6 +96,10 @@ export default function BeforeAfterCard({
         borderRadius: 3,
         overflow: "hidden",
         borderColor: borderCol,
+        "@media (pointer: coarse)": {
+          // sin “salto” visual de hover en táctiles
+          "&:hover": { transform: "none", boxShadow: "none" },
+        },
       }}
     >
       {/* Comparador */}
@@ -111,7 +118,7 @@ export default function BeforeAfterCard({
         aria-label="Before and after photo comparison"
         sx={{
           position: "relative",
-          aspectRatio: ratio,
+          aspectRatio: { xs: "3 / 4", sm: ratio, md: ratio }, // ↑ móvil en vertical para ocupar mejor pantalla
           userSelect: "none",
           outline: "none",
           "&:focus-visible .ba-handle": {
@@ -139,13 +146,17 @@ export default function BeforeAfterCard({
         {/* Handle / Guía */}
         <Box
           className="ba-handle"
-          aria-hidden
+          role="slider"
+          aria-label="Comparison handle"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(percent)}
           sx={{
             position: "absolute",
             top: 0,
             bottom: 0,
-            left: `calc(${percent}% - 14px)`,
-            width: 28,
+            left: `calc(${percent}% - 18px)`,
+            width: { xs: 36, md: 28 },                 // ↑ mayor “touch target” en móvil
             display: "grid",
             placeItems: "center",
             cursor: "ew-resize",
@@ -154,10 +165,10 @@ export default function BeforeAfterCard({
         >
           <Box
             sx={{
-              width: 6,
+              width: { xs: 8, md: 6 },
               height: "64%",
               borderRadius: 3,
-              bgcolor: alpha(theme.palette.background.paper, 0.8),
+              bgcolor: alpha(theme.palette.background.paper, 0.86),
               border: `1px solid ${alpha(theme.palette.primary.main, 0.25)}`,
               boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.25)}`,
               position: "relative",
@@ -170,12 +181,12 @@ export default function BeforeAfterCard({
               },
               "&::before": {
                 top: -14,
-                borderBottomColor: alpha(theme.palette.background.paper, 0.8),
+                borderBottomColor: alpha(theme.palette.background.paper, 0.86),
                 filter: `drop-shadow(0 -1px 0 ${alpha(theme.palette.primary.main, 0.2)})`,
               },
               "&::after": {
                 bottom: -14,
-                borderTopColor: alpha(theme.palette.background.paper, 0.8),
+                borderTopColor: alpha(theme.palette.background.paper, 0.86),
                 filter: `drop-shadow(0 1px 0 ${alpha(theme.palette.primary.main, 0.2)})`,
               },
             }}
@@ -200,12 +211,20 @@ export default function BeforeAfterCard({
       {(caption || tags.length) && (
         <Stack spacing={1.25} sx={{ p: { xs: 2, md: 2.5 } }}>
           {caption && (
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, letterSpacing: "-0.01em" }}>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 800,
+                letterSpacing: "-0.01em",
+                fontSize: { xs: 16, md: 18 },
+                lineHeight: { xs: 1.25, md: 1.3 },
+              }}
+            >
               {caption}
             </Typography>
           )}
           {tags.length > 0 && (
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
               {tags.map((t) => (
                 <Chip
                   key={t}
@@ -245,12 +264,10 @@ function ImageOrPlaceholder({
     const bg =
       side === "before"
         ? `linear-gradient(135deg, ${alpha(theme.palette.error.main, 0.16)}, ${alpha(
-            theme.palette.error.light,
-            0.12
+            theme.palette.error.light, 0.12
           )})`
         : `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.18)}, ${alpha(
-            theme.palette.success.light,
-            0.12
+            theme.palette.success.light, 0.12
           )})`;
 
     return (
@@ -268,7 +285,7 @@ function ImageOrPlaceholder({
         <Typography
           sx={{
             fontWeight: 900,
-            fontSize: { xs: 20, sm: 24 },
+            fontSize: { xs: 18, sm: 20 },
             letterSpacing: ".08em",
             textTransform: "uppercase",
           }}
@@ -285,6 +302,7 @@ function ImageOrPlaceholder({
       src={src}
       alt={alt}
       loading="lazy"
+      decoding="async"
       sx={{
         position: "absolute",
         inset: 0,

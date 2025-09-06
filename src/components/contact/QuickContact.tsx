@@ -1,3 +1,4 @@
+// src/components/contact/QuickContact.tsx
 import { Stack, Chip, Button } from "@mui/material";
 import LocalPhoneRoundedIcon from "@mui/icons-material/LocalPhoneRounded";
 import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
@@ -27,13 +28,11 @@ export default function QuickContact({
     <Stack spacing={dense ? 1 : 1.5}>
       {showChips && (
         <Stack direction="row" flexWrap="wrap" gap={1}>
-          {[{
-            icon: <LocalPhoneRoundedIcon />, label: PHONE_DISPLAY, href: `tel:${PHONE_TEL}`
-          },{
-            icon: <MailOutlineRoundedIcon />, label: EMAIL, href: `mailto:${EMAIL}`
-          },{
-            icon: <PlaceOutlinedIcon />, label: ADDRESS
-          }].map((c) => (
+          {[
+            { icon: <LocalPhoneRoundedIcon />, label: PHONE_DISPLAY, href: `tel:${PHONE_TEL}` },
+            { icon: <MailOutlineRoundedIcon />, label: EMAIL, href: `mailto:${EMAIL}` },
+            { icon: <PlaceOutlinedIcon />, label: ADDRESS },
+          ].map((c) => (
             <Chip
               key={c.label}
               icon={c.icon}
@@ -45,9 +44,12 @@ export default function QuickContact({
               size="medium"
               sx={(t) => ({
                 borderRadius: 2,
-                borderColor: alpha(t.palette.primary.main,.25),
-                backgroundColor: alpha(t.palette.primary.main,.06),
-                "& .MuiChip-icon": { color: "text.secondary" },
+                borderColor: alpha(t.palette.primary.main, .25),
+                backgroundColor: alpha(t.palette.primary.main, .06),
+                // mejora de legibilidad en móvil sin cambiar desktop
+                "& .MuiChip-label": { fontSize: { xs: 12, md: 14 } },
+                minHeight: { xs: 34, md: 36 },
+                px: { xs: 0.5, md: 1 },
               })}
             />
           ))}
@@ -55,7 +57,11 @@ export default function QuickContact({
       )}
 
       {showActions && (
-        <Stack direction="row" spacing={1.25}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={1.25}
+          alignItems={{ xs: "stretch", sm: "center" }}
+        >
           <Button
             variant="contained"
             color="success"
@@ -65,7 +71,7 @@ export default function QuickContact({
             rel="noopener"
             sx={(t) => ({
               borderRadius: 2,
-              minHeight: 40,
+              minHeight: 44,                 // tap target cómodo en móvil
               px: 2,
               boxShadow: `0 6px 16px ${alpha(t.palette.success.main, 0.25)}`,
             })}
@@ -77,7 +83,7 @@ export default function QuickContact({
             variant="outlined"
             startIcon={<LocalPhoneRoundedIcon />}
             href={`tel:${PHONE_TEL}`}
-            sx={{ borderRadius: 2, minHeight: 40, px: 2 }}
+            sx={{ borderRadius: 2, minHeight: 44, px: 2 }}
           >
             Call
           </Button>

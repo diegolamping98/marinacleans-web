@@ -39,6 +39,10 @@ export default function ServiceCard({
           transform: "translateY(-3px)",
           borderColor: alpha(t.palette.primary.main, 0.35),
         },
+        // En pantallas táctiles evitamos "saltos" de hover
+        "@media (pointer: coarse)": {
+          "&:hover": { boxShadow: "none", transform: "none", borderColor: t.palette.divider },
+        },
       })}
     >
       <CardActionArea component="a" href={href} aria-label={title} sx={{ display: "block" }}>
@@ -51,7 +55,7 @@ export default function ServiceCard({
             loading="lazy"
             sx={(t) => ({
               width: "100%",
-              aspectRatio: "4 / 3",
+              aspectRatio: { xs: "16 / 9", md: "4 / 3" }, // móvil más panorámica
               objectFit: "cover",
               objectPosition: "center",
               display: "block",
@@ -61,7 +65,7 @@ export default function ServiceCard({
         ) : (
           <Box
             sx={(t) => ({
-              aspectRatio: "4 / 3",
+              aspectRatio: { xs: "16 / 9", md: "4 / 3" },
               width: "100%",
               bgcolor: alpha(t.palette.primary.light, 0.08),
               borderBottom: `1px solid ${alpha(t.palette.primary.main, 0.12)}`,
@@ -79,16 +83,16 @@ export default function ServiceCard({
         )}
 
         {/* Contenido */}
-        <CardContent sx={{ pt: 3, px: { xs: 2.5, md: 3 }, pb: 2.5 }}>
-          {/* Badge del ícono (vertical, centrado) */}
+        <CardContent sx={{ pt: { xs: 2, md: 3 }, px: { xs: 2, md: 3 }, pb: { xs: 2, md: 2.5 } }}>
+          {/* Badge del ícono */}
           <Box
             sx={(t) => ({
               display: "flex",
               justifyContent: "center",
-              mb: 1.5,
+              mb: { xs: 1.25, md: 1.5 },
               "& .lozenge": {
-                width: 72,
-                height: 72,
+                width: { xs: 56, md: 72 },   // más compacto en móvil
+                height: { xs: 56, md: 72 },
                 borderRadius: 3,
                 display: "inline-flex",
                 alignItems: "center",
@@ -98,11 +102,9 @@ export default function ServiceCard({
                   t.palette.secondary.light, 0.28
                 )})`,
                 border: `1px solid ${alpha(t.palette.secondary.main, 0.45)}`,
-                boxShadow: `0 12px 28px ${alpha(t.palette.secondary.main, 0.28)}, inset 0 1px 0 ${alpha(
-                  "#fff", 0.35
-                )}`,
+                boxShadow: `0 12px 28px ${alpha(t.palette.secondary.main, 0.28)}, inset 0 1px 0 ${alpha("#fff", 0.35)}`,
               },
-              "& svg": { fontSize: 34 },
+              "& svg": { fontSize: { xs: 28, md: 34 } },
             })}
           >
             <Box className="lozenge">{icon}</Box>
@@ -110,7 +112,13 @@ export default function ServiceCard({
 
           <Typography
             variant="subtitle1"
-            sx={{ fontWeight: 900, letterSpacing: "-0.01em", textAlign: "center" }}
+            sx={{
+              fontWeight: 900,
+              letterSpacing: "-0.01em",
+              textAlign: "center",
+              fontSize: { xs: 16, md: 18 },     // legible en xs, igual en md+
+              lineHeight: { xs: 1.25, md: 1.3 },
+            }}
           >
             {title}
           </Typography>
@@ -120,9 +128,11 @@ export default function ServiceCard({
             sx={{
               mt: 0.75,
               textAlign: "center",
+              fontSize: { xs: 14, md: 16 },
+              lineHeight: { xs: 1.45, md: 1.55 },
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
-              WebkitLineClamp: open ? "unset" : 3,
+              WebkitLineClamp: open ? "unset" : 3, // clamp en móvil para evitar tarjetas largas
               overflow: "hidden",
             }}
           >
@@ -132,7 +142,11 @@ export default function ServiceCard({
           {more && (
             <>
               <Collapse in={open} unmountOnExit>
-                <Typography id={`more-${slug}`} color="text.secondary" sx={{ mt: 1, textAlign: "center" }}>
+                <Typography
+                  id={`more-${slug}`}
+                  color="text.secondary"
+                  sx={{ mt: 1, textAlign: "center", fontSize: { xs: 14, md: 15 } }}
+                >
                   {more}
                 </Typography>
               </Collapse>
@@ -141,7 +155,16 @@ export default function ServiceCard({
                 size="small"
                 color="primary"
                 onClick={handleToggle}
-                sx={{ mt: 0.75, px: 0, minWidth: "auto", fontWeight: 700, display: "block", mx: "auto" }}
+                sx={{
+                  mt: 0.75,
+                  px: 0,
+                  minWidth: "auto",
+                  fontWeight: 700,
+                  display: "block",
+                  mx: "auto",
+                  // zona táctil más cómoda en móvil
+                  py: { xs: 0.75, md: 0.25 },
+                }}
                 aria-expanded={open}
                 aria-controls={`more-${slug}`}
               >

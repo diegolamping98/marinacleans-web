@@ -1,4 +1,3 @@
-// src/components/services/ServicesGrid.tsx
 import type { Variants } from "framer-motion";
 import Grid from "@mui/material/Grid";
 import { Box } from "@mui/material";
@@ -71,7 +70,6 @@ export default function ServicesGrid() {
       y: 0,
       transition: {
         duration: 0.45,
-        // cubic-bezier equivalente a un easeOut suave
         ease: [0.22, 1, 0.36, 1],
       },
     },
@@ -81,7 +79,9 @@ export default function ServicesGrid() {
     <Box>
       <MotionGrid
         container
-        spacing={{ xs: 2.5, md: 3 }}
+        // En xs reducimos un poco el spacing para que quepa todo sin “respirar” de más;
+        // en md+ se mantiene idéntico.
+        spacing={{ xs: 2, sm: 2.5, md: 3 }}
         variants={container}
         initial="hidden"
         whileInView="show"

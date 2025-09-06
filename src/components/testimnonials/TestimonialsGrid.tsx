@@ -1,4 +1,3 @@
-// src/components/testimonials/TestimonialsGrid.tsx
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
@@ -8,7 +7,6 @@ import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import { alpha } from "@mui/material/styles";
 import TestimonialCard from "./TestimonialCard";
 import { usePublicReviews } from "./hooks/usePublicReviews";
-
 
 const CSV_URL = import.meta.env.VITE_REVIEWS_CSV_URL as string;
 
@@ -21,7 +19,7 @@ export default function TestimonialsGrid() {
       sx={{
         display: "flex",
         justifyContent: { xs: "center", md: "flex-end" },
-        mb: 3,
+        mb: { xs: 2.5, md: 3 },
       }}
     >
       <Chip
@@ -36,7 +34,13 @@ export default function TestimonialsGrid() {
           borderRadius: 2,
           borderColor: alpha(t.palette.primary.main, 0.25),
           backgroundColor: alpha(t.palette.primary.main, 0.06),
-          ".MuiChip-label": { fontWeight: 700 },
+          ".MuiChip-label": {
+            fontWeight: 700,
+            px: { xs: 0.75, md: 1.25 },
+            py: { xs: 0.25, md: 0.5 },
+            fontSize: { xs: 13, md: 14 },
+          },
+          height: { xs: 28, md: 32 },
         })}
       />
     </Box>
@@ -46,7 +50,7 @@ export default function TestimonialsGrid() {
     return (
       <Box>
         {Header}
-        <Box sx={{ display: "grid", placeItems: "center", py: 6 }}>
+        <Box sx={{ display: "grid", placeItems: "center", py: { xs: 5, md: 6 } }}>
           <CircularProgress />
         </Box>
       </Box>
@@ -68,7 +72,7 @@ export default function TestimonialsGrid() {
     <Box>
       {Header}
 
-      <Grid container spacing={3.5} alignItems="stretch">
+      <Grid container spacing={{ xs: 2.5, md: 3.5 }} alignItems="stretch">
         {reviews.map((r, i) => (
           <Grid key={`${r.name}-${i}`} item xs={12} md={4}>
             <TestimonialCard name={r.name} text={r.text} rating={r.rating} />

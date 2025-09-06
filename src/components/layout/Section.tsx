@@ -1,4 +1,3 @@
-// src/components/layout/Section.tsx
 import type { PropsWithChildren } from "react";
 import type { Variants } from "framer-motion";
 import { Box, Container, Typography, Divider } from "@mui/material";
@@ -28,7 +27,14 @@ export default function Section({ id, title, subtitle, maxWidth = "lg", children
   const reduce = useReducedMotion();
 
   return (
-    <Box id={id} component="section" sx={{ py: { xs: 8, md: 12 }, scrollMarginTop: 80 }}>
+    <Box
+      id={id}
+      component="section"
+      sx={{
+        py: { xs: 4, md: 12 },           // ↓ móvil más compacto; desktop igual
+        scrollMarginTop: { xs: 76, md: 88 }, // anclas correctas según header
+      }}
+    >
       <Container maxWidth={maxWidth}>
         <MotionBox
           initial="hidden"
@@ -53,7 +59,7 @@ export default function Section({ id, title, subtitle, maxWidth = "lg", children
                 variant="subtitle1"
                 color="text.secondary"
                 textAlign="center"
-                sx={{ maxWidth: 640, mx: "auto", mb: 4 }}
+                sx={{ maxWidth: 640, mx: "auto", mb: { xs: 3, md: 4 } }} // ↓ móvil
               >
                 {subtitle}
               </Typography>
@@ -61,7 +67,7 @@ export default function Section({ id, title, subtitle, maxWidth = "lg", children
           )}
 
           <MotionBox variants={dividerGrow} style={{ transformOrigin: "center" }}>
-            <Divider sx={{ maxWidth: 80, mx: "auto", mb: { xs: 4, md: 6 } }} />
+            <Divider sx={{ maxWidth: 80, mx: "auto", mb: { xs: 3.5, md: 6 } }} />
           </MotionBox>
 
           <MotionBox variants={fadeUp}>{children}</MotionBox>

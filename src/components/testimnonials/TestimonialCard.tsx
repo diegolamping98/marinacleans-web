@@ -34,20 +34,22 @@ export default function TestimonialCard({
         overflow: "hidden",
         position: "relative",
         background: `linear-gradient(180deg, ${alpha(t.palette.primary.main, 0.03)}, ${alpha(
-          t.palette.secondary.main,
-          0.03
+          t.palette.secondary.main, 0.03
         )})`,
-        transition:
-          "transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease",
+        transition: "transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease",
         borderColor: alpha(t.palette.primary.main, 0.12),
         "&:hover": {
           transform: "translateY(-4px)",
           boxShadow: `0 14px 32px ${alpha(t.palette.primary.main, 0.18)}`,
           borderColor: alpha(t.palette.primary.main, 0.35),
           background: `linear-gradient(180deg, ${alpha(t.palette.primary.main, 0.05)}, ${alpha(
-            t.palette.secondary.main,
-            0.05
+            t.palette.secondary.main, 0.05
           )})`,
+        },
+        // Evitar "saltos" de hover en pantallas táctiles
+        "@media (pointer: coarse)": {
+          transition: "none",
+          "&:hover": { transform: "none", boxShadow: "none", borderColor: alpha(t.palette.primary.main, 0.12) },
         },
       })}
     >
@@ -60,30 +62,31 @@ export default function TestimonialCard({
         })}
       />
 
-      {/* Marca de agua de comillas (muy sutil) */}
+      {/* Marca de agua de comillas (más sutil en móvil) */}
       <FormatQuoteRoundedIcon
         aria-hidden
         sx={(t) => ({
           position: "absolute",
-          right: -6,
-          top: 6,
-          fontSize: 96,
+          right: { xs: -4, md: -6 },
+          top: { xs: 2, md: 6 },
+          fontSize: { xs: 64, md: 96 },
           color: alpha(t.palette.secondary.main, 0.08),
           transform: "rotate(180deg)",
+          pointerEvents: "none",
         })}
       />
 
-      <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
-        <Stack spacing={1.75}>
+      <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+        <Stack spacing={{ xs: 1.5, md: 1.75 }}>
           {/* Badge de quote + avatar inicial */}
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={{ xs: 1.25, md: 1.5 }} alignItems="center">
             {/* Badge de quote con glow rosa */}
             <Box sx={{ position: "relative" }}>
               <Box
                 aria-hidden
                 sx={(t) => ({
                   position: "absolute",
-                  inset: -8,
+                  inset: { xs: -6, md: -8 },
                   borderRadius: "50%",
                   background: `radial-gradient(closest-side, ${alpha(t.palette.secondary.main, 0.18)}, transparent 70%)`,
                   filter: "blur(2px)",
@@ -92,36 +95,33 @@ export default function TestimonialCard({
               <Box
                 sx={(t) => ({
                   position: "relative",
-                  width: 48,
-                  height: 48,
+                  width: { xs: 44, md: 48 },
+                  height: { xs: 44, md: 48 },
                   borderRadius: "50%",
                   display: "grid",
                   placeItems: "center",
                   color: t.palette.primary.main,
-                  background: `linear-gradient(135deg, ${alpha(
-                    t.palette.secondary.main,
-                    0.22
-                  )}, ${alpha(t.palette.secondary.light, 0.28)})`,
+                  background: `linear-gradient(135deg, ${alpha(t.palette.secondary.main, 0.22)}, ${alpha(
+                    t.palette.secondary.light, 0.28
+                  )})`,
                   border: `1px solid ${alpha(t.palette.secondary.main, 0.45)}`,
-                  boxShadow: `0 10px 24px ${alpha(
-                    t.palette.secondary.main,
-                    0.26
-                  )}, inset 0 1px 0 ${alpha("#fff", 0.35)}`,
+                  boxShadow: `0 10px 24px ${alpha(t.palette.secondary.main, 0.26)}, inset 0 1px 0 ${alpha("#fff", 0.35)}`,
                 })}
               >
                 <FormatQuoteRoundedIcon fontSize="small" />
               </Box>
             </Box>
 
-            {/* Avatar inicial en azul suave */}
+            {/* Avatar inicial */}
             <Box
               sx={(t) => ({
-                width: 40,
-                height: 40,
+                width: { xs: 36, md: 40 },
+                height: { xs: 36, md: 40 },
                 borderRadius: "50%",
                 display: "grid",
                 placeItems: "center",
                 fontWeight: 800,
+                fontSize: { xs: 12, md: 13 },
                 color: t.palette.primary.dark,
                 backgroundColor: alpha(t.palette.primary.main, 0.1),
                 border: `1px solid ${alpha(t.palette.primary.main, 0.25)}`,
@@ -142,17 +142,25 @@ export default function TestimonialCard({
               i < rating ? (
                 <StarRoundedIcon key={i} fontSize="small" />
               ) : (
-                <StarOutlineRoundedIcon
-                  key={i}
-                  fontSize="small"
-                  sx={{ color: "action.disabled" }}
-                />
+                <StarOutlineRoundedIcon key={i} fontSize="small" sx={{ color: "action.disabled" }} />
               )
             )}
           </Box>
 
-          {/* Texto */}
-          <Typography sx={{ fontStyle: "italic" }}>"{text}"</Typography>
+          {/* Texto (clamp en móvil para evitar tarjetas larguísimas) */}
+          <Typography
+            sx={{
+              fontStyle: "italic",
+              fontSize: { xs: 14, md: 16 },
+              lineHeight: { xs: 1.55, md: 1.6 },
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: { xs: 6, md: "unset" }, // máx 6 líneas en xs
+              overflow: "hidden",
+            }}
+          >
+            “{text}”
+          </Typography>
 
           {/* Autor */}
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>

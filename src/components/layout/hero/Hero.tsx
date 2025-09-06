@@ -11,7 +11,6 @@ import { motion, useScroll, useTransform, type Variants } from "framer-motion";
 import { MOSAIC, type MosaicPhoto } from "./mosaicPhotos";
 
 const MotionBox = motion(Box);
-// ✅ nuevos motion components
 const MotionStack = motion(Stack);
 const MotionChip = motion(Chip);
 
@@ -32,7 +31,8 @@ export default function Hero() {
   const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -80]);
 
   return (
-    <Box component="section" sx={{ position: "relative", overflow: "hidden", py: { xs: 8, md: 10 },
+    <Box component="section" sx={{
+      position: "relative", overflow: "hidden", py: { xs: 8, md: 10 },
       background:
         "radial-gradient(1200px 400px at 10% -10%, rgba(236,72,153,.12), transparent), radial-gradient(900px 360px at 95% -20%, rgba(167,139,250,.12), transparent), linear-gradient(135deg,#FFF7FB 0%, #FFFFFF 55%, #FDF2FB 100%)",
     }}>
@@ -42,32 +42,31 @@ export default function Hero() {
       }} />
 
       <Container maxWidth="lg">
-        <Grid container spacing={6} alignItems="center">
+        {/* spacing md igual; en xs un poco menor */}
+        <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
           {/* LEFT */}
           <Grid item xs={12} md={6}>
-            {/* ⛏️ reemplaza MotionBox component={Stack} */}
             <MotionStack
               variants={stagger}
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.4 }}
-              spacing={2.25}
+              spacing={2.25}   // ← se mantiene
             >
-              {/* ⛏️ reemplaza MotionBox component={Chip} */}
               <MotionChip
                 variants={fadeUp}
                 color="secondary"
                 variant="outlined"
                 icon={<VerifiedRounded />}
                 label="Trusted residential & commercial cleaning"
-                sx={{ alignSelf: "flex-start" }}
+                sx={{ alignSelf: "flex-start", mb: { xs: 1, md: 0 } }}   // ← solo xs agrega aire
                 className="anim-border-glow"
               />
 
               <MotionBox variants={fadeUp}>
                 <Typography component="h1" sx={{
                   fontWeight: 900, lineHeight: 1.05, letterSpacing: "-0.02em",
-                  fontSize: { xs: 30, sm: 38, md: 46 },
+                  fontSize: { xs: 30, sm: 38, md: 46 },  // ← igual que tenías
                 }}>
                   Sparkling spaces, <span className="anim-shine-text">made in minutes</span>
                 </Typography>
@@ -75,11 +74,12 @@ export default function Hero() {
 
               <MotionBox variants={fadeUp}>
                 <Typography color="text.secondary" sx={{ maxWidth: 620 }}>
-                  Fast, reliable cleaning by an experienced female team. Eco-friendly,
+                  Fast, reliable cleaning by an experienced team. Eco-friendly,
                   detail-oriented, and satisfaction guaranteed.
                 </Typography>
               </MotionBox>
 
+              {/* Chips: separación SOLO en móvil, desktop intacto */}
               <MotionBox variants={fadeUp}>
                 <TrustRow
                   items={[
@@ -89,13 +89,31 @@ export default function Hero() {
                 />
               </MotionBox>
 
+              {/* CTAs: en xs permiten wrap con gap; en md+ igual que estaba */}
               <MotionBox variants={fadeUp}>
-                <Stack direction="row" spacing={1.25} flexWrap="wrap">
-                  <Button size="large" variant="contained" href="#quote" sx={{ borderRadius: 2 }} className="anim-btn-shine">
+                <Stack
+                  direction="row"
+                  flexWrap={{ xs: "wrap", md: "nowrap" }}
+                  gap={{ xs: 1.25, md: 0 }}          // ← solo xs
+                  spacing={{ xs: 0, md: 1.25 }}
+                >
+                  <Button
+                    size="large"
+                    variant="contained"
+                    href="#quote"
+                    sx={{ borderRadius: 2, minWidth: { xs: "100%", md: "auto" } }}
+                    className="anim-btn-shine"
+                  >
                     Get a quote in minutes
                   </Button>
-                  <Button size="large" variant="outlined" href={`tel:${PHONE_TEL}`} startIcon={<LocalPhoneRounded />}
-                    sx={{ borderRadius: 2 }} className="anim-btn-shine">
+                  <Button
+                    size="large"
+                    variant="outlined"
+                    href={`tel:${PHONE_TEL}`}
+                    startIcon={<LocalPhoneRounded />}
+                    sx={{ borderRadius: 2, minWidth: { xs: "100%", md: "auto" } }}
+                    className="anim-btn-shine"
+                  >
                     Call {PHONE_DISPLAY}
                   </Button>
                 </Stack>
@@ -107,22 +125,22 @@ export default function Hero() {
           <Grid item xs={12} md={6}>
             <MotionBox style={prefersReduce ? {} : { y: parallaxY }}>
               <Box sx={{
-                position: "relative", p: 2, borderRadius: 3, bgcolor: "background.paper",
+                position: "relative", p: { xs: 1.5, md: 2 }, borderRadius: 3, bgcolor: "background.paper",
                 border: "1px solid", borderColor: "divider", boxShadow: 2,
               }}>
                 <Box sx={{
-                  display: "grid", gap: 1.25,
+                  display: "grid", gap: { xs: 1, md: 1.25 },
                   gridTemplateColumns: { xs: "repeat(2, 1fr)", md: "2fr 1fr 1fr" },
                   gridAutoRows: { xs: 120, md: 160 },
                 }}>
-                  <FloatingMosaic img={MOSAIC[0]} priority span="2x2" delay={0} />
-                  <FloatingMosaic img={MOSAIC[1]} delay={0.2} />
-                  <FloatingMosaic img={MOSAIC[5]} delay={0.4} />
-                  <FloatingMosaic img={MOSAIC[3]} delay={0.6} />
-                  <FloatingMosaic img={MOSAIC[4]} delay={0.8} />
+                  <FloatingMosaic img={MOSAIC[0]} priority span="2x2" />
+                  <FloatingMosaic img={MOSAIC[1]} />
+                  <FloatingMosaic img={MOSAIC[5]} />
+                  <FloatingMosaic img={MOSAIC[3]} />
+                  <FloatingMosaic img={MOSAIC[4]} />
                   {MOSAIC[5] && (
                     <Box sx={{ display: { xs: "none", md: "block" } }}>
-                      <FloatingMosaic img={MOSAIC[2]} delay={1.0} />
+                      <FloatingMosaic img={MOSAIC[2]} />
                     </Box>
                   )}
                 </Box>
@@ -152,11 +170,24 @@ export default function Hero() {
 /* Helpers */
 function TrustRow({ items }: { items: { icon: ReactNode; text: string }[] }) {
   return (
-    <Stack direction="row" spacing={1} flexWrap="wrap">
+    <Stack
+      direction="row"
+      flexWrap={{ xs: "wrap", md: "nowrap" }}
+      gap={{ xs: 1, md: 0 }}                 // ← agrega aire solo en móvil
+      spacing={{ xs: 0, md: 1 }}
+    >
       {items.map((i, idx) => (
-        <Stack key={idx} direction="row" spacing={0.75} alignItems="center"
+        <Stack
+          key={idx}
+          direction="row"
+          spacing={0.75}
+          alignItems="center"
           className="anim-border-glow"
-          sx={{ px: 1, py: 0.5, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}>
+          sx={{
+            px: 1, py: 0.5, borderRadius: 2,
+            border: "1px solid", borderColor: "divider", bgcolor: "background.paper",
+          }}
+        >
           <Box sx={{ color: "primary.main", display: "inline-flex" }}>{i.icon}</Box>
           <Typography variant="body2">{i.text}</Typography>
         </Stack>
@@ -170,7 +201,6 @@ function FloatingMosaic({
 }: {
   img?: MosaicPhoto;
   span?: "2x2";
-  delay?: number;
   priority?: boolean;
 }) {
   const theme = useTheme();

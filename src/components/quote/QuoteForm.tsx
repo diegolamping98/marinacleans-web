@@ -70,6 +70,19 @@ export default function QuoteForm() {
   const [consent, setConsent] = useState(true);
   const [errors, setErrors] = useState<Errors>({});
 
+  // WhatsApp prellenado (para CTA post-envío)
+  const waText = useMemo(() => {
+    const lines = [
+      `Hi Marina Cleans! I'm ${name || "a new lead"} from ${city || "the SF Bay Area"}.`,
+      facility ? `Facility: ${facility}.` : "",
+      frequency ? `Frequency: ${frequency}.` : "",
+      bestTime ? `Best time to contact: ${bestTime}.` : "",
+      "I'd like to schedule a quick call for a custom quote.",
+    ].filter(Boolean);
+    return encodeURIComponent(lines.join(" "));
+  }, [name, city, facility, frequency, bestTime]);
+  const waHref = `https://wa.me/${PHONE_TEL.replace(/\D/g, "")}?text=${waText}`;
+
   // Validación
   const validateAll = (): Errors => {
     const next: Errors = {};
@@ -106,45 +119,35 @@ export default function QuoteForm() {
     setErrors((prev) => ({ ...prev, [field]: msg || undefined }));
   };
 
-  // WhatsApp prellenado (para CTA post-envío)
-  const waText = useMemo(() => {
-    const lines = [
-      `Hi Marina Cleans! I'm ${name || "a new lead"} from ${city || "the SF Bay Area"}.`,
-      facility ? `Facility: ${facility}.` : "",
-      frequency ? `Frequency: ${frequency}.` : "",
-      bestTime ? `Best time to contact: ${bestTime}.` : "",
-      "I'd like to schedule a quick call for a custom quote.",
-    ].filter(Boolean);
-    return encodeURIComponent(lines.join(" "));
-  }, [name, city, facility, frequency, bestTime]);
-  const waHref = `https://wa.me/${PHONE_TEL.replace(/\D/g, "")}?text=${waText}`;
-
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (status === "loading") return;
-    const raw = new FormData(e.currentTarget);
+
+    const formEl = e.currentTarget as HTMLFormElement;
+
+    const raw = new FormData(formEl);
     if ((raw.get("company") as string)?.length) return; // honeypot
 
     const v = validateAll();
     setErrors(v);
     if (Object.keys(v).length > 0) {
       const firstKey = Object.keys(v)[0] as keyof Errors;
-      const el = e.currentTarget.querySelector(`[name="${firstKey}"]`) as HTMLElement | null;
+      const el = formEl.querySelector(`[name="${firstKey}"]`) as HTMLElement | null;
       el?.focus();
       return;
     }
 
-    // Solo enviamos los campos que el usuario completó
     const data = new FormData();
     for (const [k, val] of raw.entries()) {
       if (typeof val === "string") {
-        const trimmed = val.trim();
-        if (!trimmed) continue;
-        data.append(k, trimmed);
+        const t = val.trim();
+        if (!t) continue;
+        data.append(k, t);
       } else {
         data.append(k, val);
       }
     }
+    data.append("subject", "New Quote Request - Marina Cleans");
 
     setStatus("loading");
     try {
@@ -153,14 +156,32 @@ export default function QuoteForm() {
         body: data,
         headers: { Accept: "application/json" },
       });
-      setStatus(res.ok ? "ok" : "err");
-      if (res.ok) {
-        (e.currentTarget as HTMLFormElement).reset();
+
+      let text = "";
+      try { text = await res.text(); } catch {}
+      let json: any = null;
+      try { json = text ? JSON.parse(text) : null; } catch {}
+
+      const success =
+        res.ok ||
+        (res.status >= 200 && res.status < 300) ||
+        (json && json.ok === true) ||
+        /"ok"\s*:\s*true/.test(text);
+
+      if (success) {
+        setStatus("ok");
+        formEl.reset();
         setName(""); setCity(""); setEmail(""); setPhone("");
-        setFacility(""); setFrequency(""); setContactMethod("Phone call");
-        setBestTime(""); setConsent(true); setErrors({});
+        setFacility(""); setFrequency("");
+        setContactMethod("Phone call");
+        setBestTime(""); setConsent(true);
+        setErrors({});
+        return;
       }
-    } catch {
+
+      setStatus("err");
+    } catch (err) {
+      console.error("Submit error:", err);
       setStatus("err");
     }
   }
@@ -187,13 +208,11 @@ export default function QuoteForm() {
 
   return (
     <Card variant="outlined" sx={CARD_SX as any}>
-      {/* franja superior estética (azul → rosa) */}
+      {/* franja superior estética */}
       <Box sx={(t) => ({ height: 6, background: `linear-gradient(90deg, ${t.palette.primary.main}, ${t.palette.secondary.main})` })} />
 
-      <CardContent component="form" onSubmit={onSubmit} noValidate sx={{ p: { xs: 2.5, md: 3 } }}>
-        {/* ❌ Se eliminaron los inputs ocultos _subject, _replyto y summary */}
-
-        <Grid container rowSpacing={2.5} columnSpacing={2.5}>
+      <CardContent component="form" onSubmit={onSubmit} noValidate sx={{ p: { xs: 2, md: 3 } }}>
+        <Grid container rowSpacing={{ xs: 2, md: 2.5 }} columnSpacing={{ xs: 2, md: 2.5 }}>
           {/* Row 1 */}
           <Grid item xs={12} md={6}>
             <TextField
@@ -247,7 +266,13 @@ export default function QuoteForm() {
               onChange={(e)=>{ setFacility(e.target.value); validateField("facility", e.target.value); }}
               sx={inputSx}
               error={!!errors.facility} helperText={errors.facility}
-              SelectProps={{ displayEmpty: true, MenuProps:{ sx:{ "& .MuiListSubheader-root":{ fontWeight:700, color:"text.primary"} } } }}
+              SelectProps={{
+                displayEmpty: true,
+                MenuProps:{
+                  PaperProps:{ sx:{ maxHeight: { xs: 320, md: 400 } } },
+                  sx:{ "& .MuiListSubheader-root":{ fontWeight:700, color:"text.primary"} }
+                }
+              }}
               InputProps={{ startAdornment: iconAdornment(<BusinessRoundedIcon />) }}
             >
               <MenuItem value="" disabled>Select facility type</MenuItem>
@@ -264,7 +289,7 @@ export default function QuoteForm() {
               onChange={(e)=>{ setFrequency(e.target.value); validateField("frequency", e.target.value); }}
               sx={inputSx}
               error={!!errors.frequency} helperText={errors.frequency}
-              SelectProps={{ displayEmpty: true }}
+              SelectProps={{ displayEmpty: true, MenuProps:{ PaperProps:{ sx:{ maxHeight:{ xs: 320, md: 400 } } } } }}
               InputProps={{ startAdornment: iconAdornment(<UpdateRoundedIcon />) }}
             >
               <MenuItem value="" disabled>Select frequency</MenuItem>
@@ -272,12 +297,26 @@ export default function QuoteForm() {
             </TextField>
           </Grid>
 
-          {/* Row 4 – preferencia de contacto */}
-          <Grid item xs={12} md={6}>
-            <FormControl>
-              <FormLabel>Preferred contact</FormLabel>
-              <RadioGroup row name="contact_method" value={contactMethod}
-                onChange={(e)=>setContactMethod(e.target.value as ContactMethod)}>
+          {/* Row 4 – Ajuste: radios ocupan la fila completa en md; 50/50 recién en lg */}
+          <Grid item xs={12} md={12} lg={6} sx={{ minWidth: 0 }}>
+            <FormControl sx={{ width: "100%" }}>
+              <FormLabel sx={{ mb: 0.75 }}>Preferred contact</FormLabel>
+              <RadioGroup
+                row
+                name="contact_method"
+                value={contactMethod}
+                onChange={(e)=>setContactMethod(e.target.value as ContactMethod)}
+                sx={{
+                  flexWrap: "wrap",
+                  columnGap: { xs: 1, md: 1.5, lg: 2 },
+                  rowGap: 0.5,
+                  "& .MuiFormControlLabel-root": {
+                    m: 0,
+                    mr: { xs: 1, md: 1.5, lg: 2 },
+                    whiteSpace: "nowrap",
+                  },
+                }}
+              >
                 <FormControlLabel value="Phone call" control={<Radio />} label={
                   <Stack direction="row" spacing={0.75} alignItems="center"><CallRoundedIcon fontSize="small" /> Phone</Stack>
                 }/>
@@ -290,11 +329,12 @@ export default function QuoteForm() {
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={12} lg={6} sx={{ minWidth: 0 }}>
             <TextField
               select fullWidth label="Best time to contact" name="best_time"
               value={bestTime} onChange={(e)=>setBestTime(e.target.value)} sx={inputSx}
-              SelectProps={{ displayEmpty: true }}
+              SelectProps={{ displayEmpty: true, MenuProps:{ PaperProps:{ sx:{ maxHeight:{ xs: 320, md: 400 } } } }} }
               InputProps={{ startAdornment: iconAdornment(<AccessTimeRoundedIcon />) }}
             >
               <MenuItem value="" disabled>Select a time window</MenuItem>
@@ -336,8 +376,14 @@ export default function QuoteForm() {
 
           {/* Submit */}
           <Grid item xs={12}>
-            <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-              <Button type="submit" variant="contained" size="large" disabled={status==="loading"} sx={{ borderRadius: 2 }}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ xs: "stretch", sm: "center" }}>
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                disabled={status==="loading"}
+                sx={{ borderRadius: 2, width: { xs: "100%", sm: "auto" } }}
+              >
                 {status==="loading" ? "Sending…" : "Get my quote"}
               </Button>
               <Typography variant="caption" color="text.secondary" aria-live="polite">
@@ -352,9 +398,9 @@ export default function QuoteForm() {
               <Alert
                 severity="success"
                 action={
-                  <Stack direction="row" spacing={1} sx={{ mt: { xs: 1, md: 0 } }}>
-                    <Button href={`tel:${PHONE_TEL}`} variant="outlined">Call now</Button>
-                    <Button href={waHref} variant="contained" color="success">WhatsApp</Button>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ mt: { xs: 1, md: 0 } }}>
+                    <Button href={`tel:${PHONE_TEL}`} variant="outlined" sx={{ width: { xs: "100%", sm: "auto" } }}>Call now</Button>
+                    <Button href={waHref} variant="contained" color="success" sx={{ width: { xs: "100%", sm: "auto" } }}>WhatsApp</Button>
                   </Stack>
                 }
               >

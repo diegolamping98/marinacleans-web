@@ -24,7 +24,7 @@ export default function Home() {
 
       <Box
         sx={(t) => ({
-          py: { xs: 6, md: 8 },
+          py: { xs: 5, md: 8 }, // móvil más compacto
           background: `linear-gradient(180deg, ${alpha(t.palette.secondary.light, 0.16)} 0%, #FFFFFF 60%)`,
         })}
       >
@@ -41,13 +41,13 @@ export default function Home() {
 
       <Box
         sx={(t) => ({
-          py: { xs: 6, md: 8 },
+          py: { xs: 5, md: 8 },
           background: `linear-gradient(180deg, #FFFFFF 0%, ${alpha(t.palette.primary.light, 0.10)} 100%)`,
           borderTop: `1px solid ${alpha(t.palette.primary.main, 0.08)}`,
           borderBottom: `1px solid ${alpha(t.palette.primary.main, 0.08)}`,
         })}
       >
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 } }}>
           <Section
             id="services"
             title="Our services"
@@ -59,7 +59,7 @@ export default function Home() {
         </Container>
       </Box>
 
-      <Box sx={{ py: { xs: 6, md: 8 } }}>
+      <Box sx={{ py: { xs: 5, md: 8 } }}>
         <Container maxWidth="lg">
           <Section id="process" title="How we work" subtitle="Simple and transparent process">
             <ProcessSteps />
@@ -69,7 +69,7 @@ export default function Home() {
 
       <Box
         sx={(t) => ({
-          py: { xs: 6, md: 8 },
+          py: { xs: 5, md: 8 },
           background: `linear-gradient(180deg, ${alpha(t.palette.primary.main, 0.06)} 0%, #FFFFFF 70%)`,
         })}
       >
@@ -80,12 +80,12 @@ export default function Home() {
         </Container>
       </Box>
 
-      {/* 👇 NUEVA SECCIÓN: BEFORE/AFTER */}
+      {/* Before / After */}
       <BeforeAfterSection />
 
       <Box
         sx={(t) => ({
-          py: { xs: 6, md: 8 },
+          py: { xs: 5, md: 8 },
           background: `linear-gradient(180deg, #FFFFFF 0%, ${alpha(t.palette.secondary.main, 0.10)} 100%)`,
           borderTop: `1px solid ${alpha(t.palette.secondary.main, 0.12)}`,
         })}
@@ -97,12 +97,17 @@ export default function Home() {
             subtitle="Fast response — typically within minutes."
           >
             <Container disableGutters>
-              <Grid container spacing={4} alignItems="flex-start">
-                <Grid item xs={12} md={6}>
-                  <QuoteForm />
+              {/* ⬇︎ Alineación perfecta en desktop, sin tocar móvil */}
+              <Grid container spacing={{ xs: 3, md: 4 }} alignItems="stretch">
+                <Grid item xs={12} md={6} sx={{ display: { md: "flex" } }}>
+                  <Box sx={{ flex: 1 }}>
+                    <QuoteForm />
+                  </Box>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <WhyUsCard />
+                <Grid item xs={12} md={6} sx={{ display: { md: "flex" } }}>
+                  <Box sx={{ flex: 1 }}>
+                    <WhyUsCard />
+                  </Box>
                 </Grid>
               </Grid>
             </Container>
@@ -110,7 +115,7 @@ export default function Home() {
         </Container>
       </Box>
 
-      <Box sx={{ py: { xs: 6, md: 8 } }}>
+      <Box sx={{ py: { xs: 5, md: 8 } }}>
         <Container maxWidth="lg">
           <Section id="team" title="Meet our team" subtitle="Real people committed to quality">
             <TeamGrid />
@@ -120,7 +125,7 @@ export default function Home() {
 
       <Box
         sx={(t) => ({
-          py: { xs: 6, md: 8 },
+          py: { xs: 5, md: 8 },
           background: `linear-gradient(180deg, ${alpha(t.palette.primary.light, 0.08)} 0%, #FFFFFF 100%)`,
         })}
       >
@@ -128,7 +133,7 @@ export default function Home() {
           <Section id="contact" title="Contact" subtitle="We’re close to you">
             <ContactTiles />
             <Box sx={{ mt: 3 }}>
-              <ServiceAreaMap query="San Francisco, CA" zoom={11} />
+              <ServiceAreaMap query="San Francisco, CA" zoom={11} height={320} />
             </Box>
           </Section>
         </Container>

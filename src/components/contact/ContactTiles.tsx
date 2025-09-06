@@ -36,12 +36,28 @@ function InfoRow({
   icon, label, value,
 }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
-      <Box sx={{ color: "primary.main", display: "inline-flex" }}>{icon}</Box>
-      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 76 }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: { xs: "flex-start", md: "center" },
+        gap: 1,
+        mt: 1,
+        flexWrap: "wrap",
+      }}
+    >
+      <Box sx={{ color: "primary.main", display: "inline-flex", mt: { xs: 0.25, md: 0 } }}>
+        {icon}
+      </Box>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ minWidth: { xs: 0, md: 76 }, mr: { md: 0.5 } }}
+      >
         {label}
       </Typography>
-      <Typography variant="body2">{value}</Typography>
+      <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
+        {value}
+      </Typography>
     </Box>
   );
 }
@@ -62,6 +78,7 @@ function CardHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
           )})`,
           border: `1px solid ${alpha(t.palette.secondary.main, 0.45)}`,
           boxShadow: `inset 0 1px 0 ${alpha("#fff", 0.35)}`,
+          flexShrink: 0,
         })}
       >
         {icon}
@@ -110,7 +127,7 @@ export default function ContactTiles({
           SF Peninsula &amp; Silicon Valley
         </Typography>
 
-        {/* Lista responsiva en columnas con bullets azules */}
+        {/* Lista responsiva con columnas más cómodas en móvil */}
         <Box
           component="ul"
           sx={(t) => ({
@@ -118,9 +135,14 @@ export default function ContactTiles({
             mb: 0,
             pl: 2.5,
             columnGap: 4,
-            columns: stacked ? 1 : { xs: 2, md: 3 },
+            columns: stacked ? 1 : { xs: 1, sm: 2, md: 3 }, // ← xs: 1 columna para mejor lectura
             listStyle: "none",
-            "& li": { position: "relative", pl: 1.5, mb: 0.5 },
+            "& li": {
+              position: "relative",
+              pl: 1.5,
+              mb: 0.5,
+              lineHeight: { xs: 1.6, md: 1.5 },
+            },
             "& li::before": {
               content: '"•"',
               position: "absolute",
@@ -170,19 +192,31 @@ export default function ContactTiles({
         <InfoRow
           icon={<PhoneIphoneOutlinedIcon fontSize="small" />}
           label="Phone:"
-          value={<Link underline="none" href="tel:+14156851462">(415) 685-1462</Link>}
+          value={
+            <Link underline="none" href="tel:+14156851462">
+              (415) 685-1462
+            </Link>
+          }
         />
         <InfoRow
           icon={<MailOutlineOutlinedIcon fontSize="small" />}
           label="Email:"
-          value={<Link underline="none" href="mailto:info@marinacleans.com">info@marinacleans.com</Link>}
+          value={
+            <Link underline="none" href="mailto:info@marinacleans.com">
+              info@marinacleans.com
+            </Link>
+          }
         />
 
         <Divider sx={{ my: 2 }} />
 
-        {/* Mensaje alineado al resto del sitio */}
-        <Typography variant="body2" color="text.secondary">
-          Fast response — usually in minutes. Prefer WhatsApp or a quick call? Use the buttons in the quote section or tap the links above.
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ pr: { xs: 0, md: 1 } }}
+        >
+          Fast response — usually in minutes. Prefer WhatsApp or a quick call? Use
+          the buttons in the quote section or tap the links above.
         </Typography>
       </CardContent>
     </Card>
@@ -199,9 +233,13 @@ export default function ContactTiles({
   }
 
   return (
-    <Grid container spacing={4} alignItems="stretch">
-      <Grid item xs={12} md={6}>{AreasCard}</Grid>
-      <Grid item xs={12} md={6}>{ContactCard}</Grid>
+    <Grid container spacing={{ xs: 2.5, md: 4 }} alignItems="stretch">
+      <Grid item xs={12} md={6}>
+        {AreasCard}
+      </Grid>
+      <Grid item xs={12} md={6}>
+        {ContactCard}
+      </Grid>
     </Grid>
   );
 }

@@ -1,4 +1,3 @@
-// src/components/layout/Header.tsx
 import { Link as RouterLink } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -18,16 +17,16 @@ export default function Header() {
   const trigger = useScrollTrigger({ threshold: 8 });
   const [open, setOpen] = useState(false);
 
-  // ✅ Teléfono correcto
   const PHONE_DISPLAY = "(415) 685-1462";
   const PHONE_TEL = "+14156851462";
+  const WHATS_LINK = `https://wa.me/${PHONE_TEL.replace(/\D/g, "")}`;
 
   const navItems = [
     { label: "Why us", href: "#why" },
     { label: "Services", href: "#services" },
     { label: "Process", href: "#process" },
     { label: "Reviews", href: "#testimonials" },
-    { label: "Work", href: "#work" },          // 👈 agregado
+    { label: "Work", href: "#work" },
     { label: "Contact", href: "#contact" },
   ];
 
@@ -44,10 +43,16 @@ export default function Header() {
       })}
     >
       <Container maxWidth="xl" disableGutters sx={{ px: { xs: 2, md: 3 } }}>
-        <Toolbar sx={{ gap: 1.5, minHeight: { xs: 70, md: 88 }, px: 0 }}>
-          {/* IZQUIERDA: Menú + Marca (logo grande + texto) */}
-          <Stack direction="row" alignItems="center" spacing={1.25} sx={{ flexGrow: 1, minWidth: 0 }}>
-            {/* Hamburguesa (mobile) */}
+        {/* ↑ Toolbar: más alto en xs para evitar corte de letras */}
+        <Toolbar sx={{ gap: 1.5, minHeight: { xs: 76, md: 88 }, px: 0 }}>
+          {/* IZQUIERDA: Menú + Marca */}
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={{ xs: 1.25, md: 1.5 }}
+            sx={{ flexGrow: 1, minWidth: 0 }}
+          >
+            {/* Hamburguesa (móvil) */}
             <IconButton
               onClick={() => setOpen(true)}
               aria-label="Open menu"
@@ -75,19 +80,17 @@ export default function Header() {
                 borderColor: alpha(t.palette.primary.main, 0.25),
                 color: t.palette.primary.main,
                 bgcolor: alpha(t.palette.primary.main, 0.06),
-                "&:hover": { bgcolor: alpha(t.palette.primary.main, 0.12), borderColor: alpha(t.palette.primary.main, 0.35) },
+                "&:hover": {
+                  bgcolor: alpha(t.palette.primary.main, 0.12),
+                  borderColor: alpha(t.palette.primary.main, 0.35),
+                },
               })}
             >
               Menu
             </Button>
 
-            {/* Brand: Logo imagen + texto */}
-            <Box
-              component={RouterLink}
-              to="/"
-              aria-label="Go to home"
-              style={{ textDecoration: "none" }}
-            >
+            {/* Marca */}
+            <Box component={RouterLink} to="/" aria-label="Go to home" style={{ textDecoration: "none" }}>
               <Stack direction="row" alignItems="center" spacing={{ xs: 1, md: 1.5 }}>
                 <Box
                   component="img"
@@ -100,6 +103,7 @@ export default function Header() {
                     width: "auto",
                     display: "block",
                     filter: "drop-shadow(0 3px 10px rgba(0,47,108,.18))",
+                    flexShrink: 0,
                   }}
                 />
                 <Typography
@@ -108,10 +112,14 @@ export default function Header() {
                     fontFamily: "'Great Vibes', cursive",
                     fontWeight: 500,
                     fontSize: { xs: 32, md: 48 },
-                    lineHeight: 1,
-                    display: "flex",
+                    lineHeight: { xs: 1.2, md: 1 },   // ← más aire en xs
+                    display: "inline-flex",
                     alignItems: "baseline",
                     gap: { xs: 0.5, md: 0.75 },
+                    whiteSpace: { xs: "nowrap", md: "normal" },
+                    overflow: { xs: "visible", md: "visible" },
+                    textOverflow: { xs: "clip", md: "clip" },
+                    pt: { xs: 0.25, md: 0 },          // ← 2px extra en xs arriba
                   }}
                 >
                   <Box component="span" sx={{ color: "#F19AC6" }}>Marina</Box>
@@ -121,20 +129,55 @@ export default function Header() {
             </Box>
           </Stack>
 
-          {/* DERECHA: Acciones */}
+          {/* DERECHA */}
           <Stack direction="row" spacing={1} alignItems="center">
+            {/* Compacto en móvil */}
+            <IconButton
+              href={`tel:${PHONE_TEL}`}
+              aria-label="Call"
+              sx={(t) => ({
+                display: { xs: "inline-flex", md: "none" },
+                color: t.palette.primary.main,
+                border: `1px solid ${alpha(t.palette.primary.main, 0.25)}`,
+                bgcolor: alpha(t.palette.primary.main, 0.06),
+                "&:hover": { bgcolor: alpha(t.palette.primary.main, 0.12) },
+                borderRadius: 2,
+              })}
+            >
+              <LocalPhoneRoundedIcon />
+            </IconButton>
+            <IconButton
+              href={WHATS_LINK}
+              aria-label="WhatsApp"
+              sx={(t) => ({
+                display: { xs: "inline-flex", md: "none" },
+                color: t.palette.success.main,
+                border: `1px solid ${alpha(t.palette.success.main, 0.25)}`,
+                bgcolor: alpha(t.palette.success.main, 0.06),
+                "&:hover": { bgcolor: alpha(t.palette.success.main, 0.12) },
+                borderRadius: 2,
+              })}
+            >
+              <WhatsAppIcon />
+            </IconButton>
+
+            {/* Desktop: botón con número */}
             <Button
               variant="outlined"
               color="primary"
               startIcon={<LocalPhoneRoundedIcon />}
               href={`tel:${PHONE_TEL}`}
-              sx={{ borderRadius: 2 }}
+              sx={{
+                borderRadius: 2,
+                display: { xs: "none", md: "inline-flex" },
+                whiteSpace: "nowrap",
+              }}
             >
               {PHONE_DISPLAY}
             </Button>
           </Stack>
 
-          {/* DRAWER (izquierda) */}
+          {/* DRAWER */}
           <Drawer
             anchor="left"
             open={open}
@@ -166,19 +209,15 @@ export default function Header() {
               })}
             >
               <Stack direction="row" alignItems="center" spacing={1.25}>
-                <Box
-                  component="img"
-                  src="/logo2.png"
-                  alt="Marina Cleans"
-                  loading="eager"
-                  sx={{ height: 40, width: "auto", display: "block", filter: "drop-shadow(0 2px 6px rgba(0,47,108,.18))" }}
-                />
+                <Box component="img" src="/logo2.png" alt="Marina Cleans" loading="eager"
+                  sx={{ height: 40, width: "auto", display: "block", filter: "drop-shadow(0 2px 6px rgba(0,47,108,.18))" }} />
                 <Typography
                   sx={{
                     fontWeight: 900,
                     fontSize: 24,
                     letterSpacing: "-.01em",
                     fontFamily: "'Great Vibes', cursive",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   <Box component="span" sx={{ color: "#F19AC6", mr: 0.5 }}>Marina</Box>
@@ -254,7 +293,7 @@ export default function Header() {
                   variant="contained"
                   color="success"
                   startIcon={<WhatsAppIcon />}
-                  href={`https://wa.me/${PHONE_TEL.replace(/\D/g, "")}`}
+                  href={WHATS_LINK}
                   onClick={() => setOpen(false)}
                   sx={(t) => ({
                     borderRadius: 2,

@@ -18,7 +18,7 @@ export default function ServiceAreaMap({
   compact = false,
 }: {
   query?: string;
-  areas?: string[];   // NUEVO: chips de zonas (Bay Area, Peninsula, etc.)
+  areas?: string[];   // chips de zonas (Bay Area, Peninsula, etc.)
   zone?: string;
   zoom?: number;
   height?: number;
@@ -38,8 +38,7 @@ export default function ServiceAreaMap({
         overflow: "hidden",
         borderColor: alpha(t.palette.primary.main, 0.12),
         background: `linear-gradient(180deg, ${alpha(t.palette.primary.main, 0.03)}, ${alpha(
-          t.palette.secondary.main,
-          0.03
+          t.palette.secondary.main, 0.03
         )})`,
       })}
     >
@@ -53,8 +52,16 @@ export default function ServiceAreaMap({
       />
 
       <CardContent sx={{ p: compact ? { xs: 2, md: 2.25 } : { xs: 2.5, md: 3 } }}>
-        {/* Encabezado con chips */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1, flexWrap: "wrap" }}>
+        {/* Encabezado con chips (wrap en móvil) */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            mb: 1,
+            flexWrap: "wrap",
+          }}
+        >
           <Typography variant="h6" fontWeight={900}>
             Our service area
           </Typography>
@@ -75,13 +82,14 @@ export default function ServiceAreaMap({
                   borderRadius: 2,
                   borderColor: alpha(t.palette.primary.main, 0.25),
                   backgroundColor: alpha(t.palette.primary.main, 0.06),
+                  "& .MuiChip-label": { fontSize: { xs: 12, md: 13 } },
                 })}
               />
             ))}
           </Box>
         )}
 
-        {/* Mapa */}
+        {/* Mapa (alto responsivo en móvil) */}
         <Box
           sx={{
             borderRadius: 1.5,
@@ -95,7 +103,7 @@ export default function ServiceAreaMap({
             title={title}
             src={embedUrl}
             width="100%"
-            height={height}
+            height={{ xs: Math.max(220, Math.min(height, 300)), md: height }} // xs: 220–300px
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             style={{ border: 0 }}
@@ -118,6 +126,7 @@ export default function ServiceAreaMap({
                 borderRadius: 2,
                 borderColor: alpha(t.palette.primary.main, 0.25),
                 backgroundColor: alpha(t.palette.primary.main, 0.06),
+                minHeight: { xs: 36, md: 32 }, // tap target mejor en móvil
               })}
             />
           </Box>

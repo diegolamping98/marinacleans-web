@@ -78,8 +78,8 @@ function AccentLozenge({
       sx={(t) => {
         const { fg, bg, bd, glow } = getAccentColors(t, accent);
         return {
-          width: { xs: 56, md: 64 },
-          height: { xs: 56, md: 64 },
+          width: { xs: 48, md: 64 },            // ↓ móvil más compacto
+          height: { xs: 48, md: 64 },
           borderRadius: 2.5,
           display: "inline-flex",
           alignItems: "center",
@@ -92,7 +92,7 @@ function AccentLozenge({
         };
       }}
     >
-      <Icon sx={{ fontSize: { xs: 28, md: 32 } }} />
+      <Icon sx={{ fontSize: { xs: 24, md: 32 } }} />
     </Box>
   );
 }
@@ -100,31 +100,42 @@ function AccentLozenge({
 function FeatureRow({ icon: Icon, title, desc, accent = "primary" }: Feature) {
   return (
     <Paper
+      component="li"
+      role="listitem"
       variant="outlined"
       sx={(t) => {
         const { fg } = getAccentColors(t, accent);
         return {
-          p: { xs: 2.25, md: 2.75 },
+          p: { xs: 2, md: 2.75 },               // ↓ un poco menos padding en móvil
           borderRadius: 3,
           display: "flex",
-          gap: 2,
+          gap: { xs: 1.5, md: 2 },              // gap real (mejor wrap en xs)
           alignItems: "flex-start",
           position: "relative",
           overflow: "hidden",
+          minHeight: { xs: 72, md: 0 },         // objetivo táctil cómodo
           transition: "box-shadow .25s ease, transform .25s ease, border-color .25s",
           "&:hover": {
             boxShadow: `0 12px 28px ${alpha(fg, 0.22)}, 0 1px 0 ${alpha("#000", 0.02)}`,
             transform: "translateY(-3px)",
             borderColor: alpha(fg, 0.35),
           },
-          // halo decorativo
+          // Desactiva “hover bounce” en pantallas táctiles (coarse)
+          "@media (pointer: coarse)": {
+            "&:hover": {
+              boxShadow: "none",
+              transform: "none",
+              borderColor: t.palette.divider,
+            },
+          },
+          // halo decorativo (más pequeño en móvil)
           "&::after": {
             content: '""',
             position: "absolute",
-            right: -40,
-            top: -40,
-            width: 180,
-            height: 180,
+            right: { xs: -36, md: -40 },
+            top: { xs: -36, md: -40 },
+            width: { xs: 140, md: 180 },
+            height: { xs: 140, md: 180 },
             borderRadius: "50%",
             background: `radial-gradient(circle at 50% 50%, ${alpha(fg, 0.10)} 0%, transparent 60%)`,
             filter: "blur(6px)",
@@ -134,18 +145,25 @@ function FeatureRow({ icon: Icon, title, desc, accent = "primary" }: Feature) {
       }}
     >
       <AccentLozenge Icon={Icon} accent={accent} />
-      <Box>
+      <Box sx={{ lineHeight: 1.25 }}>
         <Typography
           variant="subtitle1"
           sx={(t) => ({
             fontWeight: 900,
             letterSpacing: "-0.01em",
             color: t.palette.text.primary,
+            fontSize: { xs: 16, md: 18 },       // tamaño de título afinado en xs
           })}
         >
           {title}
         </Typography>
-        <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+        <Typography
+          color="text.secondary"
+          sx={{
+            mt: 0.5,
+            fontSize: { xs: 14, md: 16 },       // cuerpo más legible en xs
+          }}
+        >
           {desc}
         </Typography>
       </Box>
@@ -156,17 +174,18 @@ function FeatureRow({ icon: Icon, title, desc, accent = "primary" }: Feature) {
 export default function FeaturesGrid() {
   return (
     <Box
+      role="list"
       sx={(t) => ({
-        p: { xs: 2.25, md: 3 },
+        p: { xs: 2, md: 3 },                   // ↓ menos padding en móvil
         borderRadius: 3.5,
-        background: `linear-gradient(135deg, ${alpha(t.palette.secondary.light, 0.18)} 0%, #FFFFFF 58%, ${alpha(
-          t.palette.primary.light,
-          0.12
-        )} 100%)`,
+        background: `linear-gradient(135deg, ${alpha(
+          t.palette.secondary.light,
+          0.18
+        )} 0%, #FFFFFF 58%, ${alpha(t.palette.primary.light, 0.12)} 100%)`,
         border: `1px solid ${alpha(t.palette.primary.main, 0.08)}`,
       })}
     >
-      <Grid container spacing={2.75}>
+      <Grid container spacing={{ xs: 1.75, md: 2.75 }}>
         {FEATURES.map((f) => (
           <Grid key={f.title} item xs={12} md={6}>
             <FeatureRow {...f} />
